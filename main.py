@@ -1,7 +1,9 @@
 import tkinter as tk
 from tkinter import messagebox
-from src.base_de_datos import ejecutar_consulta, obtener_resultados, crear_tabla_usuarios
-from src.base_de_datos import agregar_vino, agregar_opinion, agregar_experiencia, obtener_vinos, obtener_opiniones, obtener_experiencias
+from src.base_de_datos import *
+
+# Variable global para almacenar el ID del usuario actual
+usuario_actual_id = None
 
 # Funciones de autenticación
 def registrar_usuario(nombre_usuario, contrasena):
@@ -13,8 +15,16 @@ def registrar_usuario(nombre_usuario, contrasena):
         return False
 
 def iniciar_sesion_usuario(nombre_usuario, contrasena):
-    resultados = obtener_resultados("SELECT * FROM usuarios WHERE nombre_usuario = ? AND contrasena = ?", (nombre_usuario, contrasena))
-    return len(resultados) > 0
+    global usuario_actual_id
+    try:
+        resultados = obtener_resultados("SELECT id FROM usuarios WHERE nombre_usuario = ? AND contrasena = ?", (nombre_usuario, contrasena))
+        if len(resultados) > 0:
+            usuario_actual_id = resultados[0][0]
+            return True
+        return False
+    except Exception as e:
+        print(f"Error al iniciar sesión: {e}")
+        return False
 
 # Interfaz gráfica
 class VentanaInicioSesion(tk.Tk):
@@ -44,16 +54,20 @@ class VentanaInicioSesion(tk.Tk):
         contrasena = self.entry_contrasena.get()
         if iniciar_sesion_usuario(nombre_usuario, contrasena):
             messagebox.showinfo("Éxito", "Inicio de sesión correcto")
+            self.destroy()
+            VentanaPrincipal().mainloop()
         else:
             messagebox.showerror("Error", "Usuario o contraseña incorrectos")
 
     def registrar(self):
-        ventana_registro = VentanaRegistro()
+        self.withdraw()
+        ventana_registro = VentanaRegistro(self)
         ventana_registro.mainloop()
+        self.deiconify()
 
-class VentanaRegistro(tk.Tk):
-    def __init__(self):
-        super().__init__()
+class VentanaRegistro(tk.Toplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
         self.title("Winny - Registrar")
         self.geometry("300x200")
         
@@ -85,27 +99,61 @@ class VentanaPrincipal(tk.Tk):
         self.title("Winny - Principal")
         self.geometry("400x300")
         
-        self.boton_agregar_vino = tk.Button(self, text="Agregar Vino", command=self.agregar_vino)
-        self.boton_agregar_vino.pack()
+        self.boton_mis_momentos = tk.Button(self, text="Mis Momentos", command=self.ver_mis_momentos)
+        self.boton_mis_momentos.pack()
 
-        self.boton_ver_vinos = tk.Button(self, text="Ver Vinos", command=self.ver_vinos)
-        self.boton_ver_vinos.pack()
+        self.boton_crear_momento = tk.Button(self, text="Crear Momento", command=self.crear_momento)
+        self.boton_crear_momento.pack()
 
-    def agregar_vino(self):
-        ventana_agregar_vino = VentanaAgregarVino()
-        ventana_agregar_vino.mainloop()
+        self.boton_recordar_momento = tk.Button(self, text="Recordar Momento", command=self.recordar_momento)
+        self.boton_recordar_momento.pack()
 
-    def ver_vinos(self):
-        ventana_ver_vinos = VentanaVerVinos()
-        ventana_ver_vinos.mainloop()
+    def ver_mis_momentos(self):
+        self.withdraw()
+        ventana_mis_momentos = VentanaMisMomentos(self)
+        ventana_mis_momentos.mainloop()
+        self.deiconify()
 
-class VentanaAgregarVino(tk.Tk):
-    def __init__(self):
-        super().__init__()
-        self.title("Agregar Vino")
-        self.geometry("300x400")
+    def crear_momento(self):
+        self.withdraw()
+        ventana_crear_momento = VentanaCrearMomento(self)
+        ventana_crear_momento.mainloop()
+        self.deiconify()
 
-        self.label_nombre = tk.Label(self, text="Nombre")
+    def recordar_momento(self):
+        self.withdraw()
+        ventana_recordar_momento = VentanaRecordarMomento(self)
+        ventana_recordar_momento.mainloop()
+        self.deiconify()
+
+class VentanaMisMomentos(tk.Toplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.title("Mis Momentos")
+        self.geometry("400x400")
+
+        self.boton_regresar = tk.Button(self, text="Regresar", command=self.regresar)
+        self.boton_regresar.pack()
+
+        try:
+            momentos = obtener_experiencias()  # Obtener los momentos del usuario actual
+            for momento in momentos:
+                momento_info = f"Vino: {momento[1]}, Contexto: {momento[2]}, Maridaje: {momento[3]}, Amigos: {momento[4]}"
+                tk.Label(self, text=momento_info).pack()
+        except Exception as e:
+            messagebox.showerror("Error", f"Error al obtener momentos: {e}")
+
+    def regresar(self):
+        self.destroy()
+        self.master.deiconify()
+
+class VentanaCrearMomento(tk.Toplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.title("Crear Momento")
+        self.geometry("300x500")
+
+        self.label_nombre = tk.Label(self, text="Nombre del Vino")
         self.label_nombre.pack()
         self.entry_nombre = tk.Entry(self)
         self.entry_nombre.pack()
@@ -135,36 +183,116 @@ class VentanaAgregarVino(tk.Tk):
         self.entry_precio = tk.Entry(self)
         self.entry_precio.pack()
 
-        self.boton_guardar = tk.Button(self, text="Guardar", command=self.guardar_vino)
+        self.label_contexto = tk.Label(self, text="Contexto")
+        self.label_contexto.pack()
+        self.entry_contexto = tk.Entry(self)
+        self.entry_contexto.pack()
+
+        self.label_maridaje = tk.Label(self, text="Maridaje")
+        self.label_maridaje.pack()
+        self.entry_maridaje = tk.Entry(self)
+        self.entry_maridaje.pack()
+
+        self.label_amigos = tk.Label(self, text="Amigos")
+        self.label_amigos.pack()
+        self.entry_amigos = tk.Entry(self)
+        self.entry_amigos.pack()
+
+        self.boton_guardar = tk.Button(self, text="Guardar", command=self.guardar_momento)
         self.boton_guardar.pack()
 
-    def guardar_vino(self):
-        nombre = self.entry_nombre.get()
-        bodega = self.entry_bodega.get()
-        ano = self.entry_ano.get()
-        tipo_uva = self.entry_tipo_uva.get()
-        denominacion_origen = self.entry_denominacion_origen.get()
-        precio = self.entry_precio.get()
+        self.boton_regresar = tk.Button(self, text="Regresar", command=self.regresar)
+        self.boton_regresar.pack()
 
-        agregar_vino(nombre, bodega, ano, tipo_uva, denominacion_origen, precio)
-        messagebox.showinfo("Éxito", "Vino agregado correctamente")
+    def guardar_momento(self):
+        try:
+            nombre = self.entry_nombre.get()
+            bodega = self.entry_bodega.get()
+            ano = self.entry_ano.get()
+            tipo_uva = self.entry_tipo_uva.get()
+            denominacion_origen = self.entry_denominacion_origen.get()
+            precio = self.entry_precio.get()
+            contexto = self.entry_contexto.get()
+            maridaje = self.entry_maridaje.get()
+            amigos = self.entry_amigos.get()
+
+            agregar_vino(nombre, bodega, ano, tipo_uva, denominacion_origen, precio)
+            agregar_experiencia(usuario_actual_id, contexto, maridaje, amigos)
+            messagebox.showinfo("Éxito", "Momento agregado correctamente")
+            self.destroy()
+            self.master.deiconify()
+        except Exception as e:
+            messagebox.showerror("Error", f"No se pudo guardar el momento: {e}")
+
+    def regresar(self):
         self.destroy()
+        self.master.deiconify()
 
-class VentanaVerVinos(tk.Tk):
-    def __init__(self):
-        super().__init__()
-        self.title("Ver Vinos")
-        self.geometry("400x400")
+class VentanaRecordarMomento(tk.Toplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.title("Recordar Momento")
+        self.geometry("400x500")
 
-        vinos = obtener_vinos()
+        self.label_contexto = tk.Label(self, text="Contexto")
+        self.label_contexto.pack()
+        self.entry_contexto = tk.Entry(self)
+        self.entry_contexto.pack()
 
-        for vino in vinos:
-            vino_info = f"Nombre: {vino[1]}, Bodega: {vino[2]}, Año: {vino[3]}, Tipo de Uva: {vino[4]}, Denominación de Origen: {vino[5]}, Precio: {vino[6]}"
-            tk.Label(self, text=vino_info).pack()
+        self.label_maridaje = tk.Label(self, text="Maridaje")
+        self.label_maridaje.pack()
+        self.entry_maridaje = tk.Entry(self)
+        self.entry_maridaje.pack()
+
+        self.label_amigos = tk.Label(self, text="Amigos")
+        self.label_amigos.pack()
+        self.entry_amigos = tk.Entry(self)
+        self.entry_amigos.pack()
+
+        self.boton_buscar = tk.Button(self, text="Buscar", command=self.buscar_momentos)
+        self.boton_buscar.pack()
+
+        self.resultados = tk.Text(self)
+        self.resultados.pack()
+
+        self.boton_regresar = tk.Button(self, text="Regresar", command=self.regresar)
+        self.boton_regresar.pack()
+
+    def buscar_momentos(self):
+        try:
+            contexto = self.entry_contexto.get()
+            maridaje = self.entry_maridaje.get()
+            amigos = self.entry_amigos.get()
+            
+            query = "SELECT * FROM experiencias WHERE 1=1"
+            parametros = []
+
+            if contexto:
+                query += " AND contexto LIKE ?"
+                parametros.append(f"%{contexto}%")
+            if maridaje:
+                query += " AND maridaje LIKE ?"
+                parametros.append(f"%{maridaje}%")
+            if amigos:
+                query += " AND amigos LIKE ?"
+                parametros.append(f"%{amigos}%")
+
+            momentos = obtener_resultados(query, parametros)
+            self.resultados.delete(1.0, tk.END)
+            for momento in momentos:
+                momento_info = f"Vino: {momento[1]}, Contexto: {momento[2]}, Maridaje: {momento[3]}, Amigos: {momento[4]}"
+                self.resultados.insert(tk.END, momento_info + "\n")
+        except Exception as e:
+            messagebox.showerror("Error", f"Error al buscar momentos: {e}")
+
+    def regresar(self):
+        self.destroy()
+        self.master.deiconify()
 
 if __name__ == "__main__":
-    # Crear la tabla de usuarios
+    # Crear las tablas de la base de datos
     crear_tabla_usuarios()
+    crear_tablas_adicionales()
 
     # Iniciar la aplicación
     app = VentanaInicioSesion()
