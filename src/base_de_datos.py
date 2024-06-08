@@ -58,11 +58,11 @@ def crear_tablas_adicionales():
         """
         CREATE TABLE IF NOT EXISTS experiencias (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            id_usuario INTEGER,
+            nombre_usuario TEXT,
             contexto TEXT,
             maridaje TEXT,
             amigos TEXT,
-            FOREIGN KEY (id_usuario) REFERENCES usuarios(id)
+            FOREIGN KEY (nombre_usuario) REFERENCES usuarios(id)
         )
         """
     ]
@@ -101,7 +101,7 @@ def obtener_opiniones():
     consulta = "SELECT * FROM opiniones"
     return obtener_resultados(consulta)
 
-def obtener_experiencias():
+def obtener_experiencias(id_usuario):
     consulta = "SELECT * FROM experiencias WHERE id_usuario = ?"
-    parametros = (usuario_actual_id,)
+    parametros = (id_usuario,)
     return obtener_resultados(consulta, parametros)
