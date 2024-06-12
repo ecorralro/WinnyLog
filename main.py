@@ -274,10 +274,10 @@ class VentanaRecordarMomento(tk.Toplevel):
         self.entry_maridaje = tk.Entry(self)
         self.entry_maridaje.pack()
 
-        self.label_amigos = tk.Label(self, text="Amigos")
-        self.label_amigos.pack()
-        self.entry_amigos = tk.Entry(self)
-        self.entry_amigos.pack()
+        self.label_companeros = tk.Label(self, text="Amigos")
+        self.label_companeros.pack()
+        self.entry_companeros = tk.Entry(self)
+        self.entry_companeros.pack()
 
         self.boton_buscar = tk.Button(self, text="Buscar", command=self.buscar_momentos)
         self.boton_buscar.pack()
@@ -292,9 +292,9 @@ class VentanaRecordarMomento(tk.Toplevel):
         try:
             contexto = self.entry_contexto.get()
             maridaje = self.entry_maridaje.get()
-            amigos = self.entry_companeros.get()
+            companeros = self.entry_companeros.get()
             
-            query = "SELECT * FROM experiencias WHERE id_usuario = ?"
+            query = "SELECT * FROM experiencias WHERE usuario_id = ?"
             parametros = [self.sesion_usuario.id]
 
             if contexto:
@@ -303,7 +303,7 @@ class VentanaRecordarMomento(tk.Toplevel):
             if maridaje:
                 query += " AND maridaje LIKE ?"
                 parametros.append(f"%{maridaje}%")
-            if amigos:
+            if companeros:
                 query += " AND companeros LIKE ?"
                 parametros.append(f"%{companeros}%")
 
