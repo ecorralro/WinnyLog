@@ -16,7 +16,7 @@ class SesionUsuario:
 
     def es_activo(self):
         return self.id is not None
-
+    
 # Funciones de autenticación
 def registrar_usuario(nombre_usuario, contrasena):
     try:
