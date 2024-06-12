@@ -222,10 +222,10 @@ class VentanaCrearMomento(tk.Toplevel):
         self.entry_maridaje = tk.Entry(self)
         self.entry_maridaje.pack()
 
-        self.label_amigos = tk.Label(self, text="Amigos")
-        self.label_amigos.pack()
-        self.entry_amigos = tk.Entry(self)
-        self.entry_amigos.pack()
+        self.label_companeros = tk.Label(self, text="Compañeros")
+        self.label_companeros.pack()
+        self.entry_companeros = tk.Entry(self)
+        self.entry_companeros.pack()
 
         self.boton_guardar = tk.Button(self, text="Guardar", command=self.guardar_momento)
         self.boton_guardar.pack()
@@ -243,10 +243,10 @@ class VentanaCrearMomento(tk.Toplevel):
             precio = self.entry_precio.get()
             contexto = self.entry_contexto.get()
             maridaje = self.entry_maridaje.get()
-            amigos = self.entry_amigos.get()
+            companeros = self.entry_companeros.get()
 
             agregar_vino(nombre, bodega, ano, tipo_uva, denominacion_origen, precio)
-            agregar_experiencia(self.sesion_usuario.id, contexto, maridaje, amigos)
+            agregar_experiencia(self.sesion_usuario.id, contexto, maridaje, companeros)
             messagebox.showinfo("Éxito", "Momento agregado correctamente")
             self.destroy()
             self.master.deiconify()
@@ -292,7 +292,7 @@ class VentanaRecordarMomento(tk.Toplevel):
         try:
             contexto = self.entry_contexto.get()
             maridaje = self.entry_maridaje.get()
-            amigos = self.entry_amigos.get()
+            amigos = self.entry_companeros.get()
             
             query = "SELECT * FROM experiencias WHERE id_usuario = ?"
             parametros = [self.sesion_usuario.id]
@@ -304,8 +304,8 @@ class VentanaRecordarMomento(tk.Toplevel):
                 query += " AND maridaje LIKE ?"
                 parametros.append(f"%{maridaje}%")
             if amigos:
-                query += " AND amigos LIKE ?"
-                parametros.append(f"%{amigos}%")
+                query += " AND companeros LIKE ?"
+                parametros.append(f"%{companeros}%")
 
             momentos = obtener_resultados(query, parametros)
             self.resultados.delete(1.0, tk.END)

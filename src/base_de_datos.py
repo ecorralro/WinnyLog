@@ -61,7 +61,7 @@ def crear_tablas_adicionales():
             usuario_id INTEGER,
             contexto TEXT,
             maridaje TEXT,
-            amigos TEXT,
+            companeros TEXT,
             FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
         )
         """
@@ -85,12 +85,12 @@ def agregar_opinion(id_vino, opinion):
     parametros = (id_vino, opinion)
     ejecutar_consulta(consulta, parametros)
 
-def agregar_experiencia(usuario_id, contexto, maridaje, amigos):
+def agregar_experiencia(usuario_id, contexto, maridaje, companeros):
     consulta = """
-    INSERT INTO experiencias (usuario_id, contexto, maridaje, amigos)
+    INSERT INTO experiencias (usuario_id, contexto, maridaje, companeros)
     VALUES (?, ?, ?, ?)
     """
-    parametros = (usuario_id, contexto, maridaje, amigos)
+    parametros = (usuario_id, contexto, maridaje, companeros)
     ejecutar_consulta(consulta, parametros)
 
 def obtener_vinos():
