@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from src.base_de_datos import ejecutar_consulta, obtener_resultados, crear_tabla_usuarios, crear_tablas_adicionales
-from src.base_de_datos import agregar_vino, agregar_experiencia, agregar_puntuacion, obtener_experiencias
+from src.base_de_datos import agregar_vino, agregar_experiencia, agregar_puntuacion, obtener_experiencias, obtener_vinos
 
 # Variable global para almacenar el ID del usuario actual
 usuario_actual_id = None
@@ -111,7 +111,7 @@ class VentanaPrincipal(tk.Tk):
 
     def ver_mis_momentos(self):
         self.withdraw()
-        ventana_mis_momentos = VentanaMisMomentos(self)
+        ventana_mis_momentos = VentanaMisMomentos(self, usuario_actual_id)
         ventana_mis_momentos.mainloop()
         self.deiconify()
 
@@ -128,8 +128,9 @@ class VentanaPrincipal(tk.Tk):
         self.deiconify()
 
 class VentanaMisMomentos(tk.Toplevel):
-    def __init__(self, parent):
+    def __init__(self, parent, usuario_actual_id):
         super().__init__(parent)
+        self.usuario_actual_id = usuario_actual_id
         self.title("Mis Momentos")
         self.geometry("400x400")
 
@@ -137,9 +138,10 @@ class VentanaMisMomentos(tk.Toplevel):
         self.boton_regresar.pack()
 
         try:
-            momentos = obtener_experiencias(usuario_actual_id)  # Obtener los momentos del usuario actual
+            momentos = obtener_experiencias(self.usuario_actual_id)  # Obtener los momentos del usuario actual
             for momento in momentos:
-                momento_info = f"Vino: {momento[1]}, Contexto: {momento[2]}, Maridaje: {momento[3]}, Compañeros: {momento[4]}"
+                vino_info = obtener_vinos(momento[2])  # Obtener información del vino por vino_id
+                momento_info = f"Vino: {vino_info}, Contexto: {momento[3]}, Maridaje: {momento[4]}, Compañeros: {momento[5]}"
                 tk.Label(self, text=momento_info).pack()
         except Exception as e:
             messagebox.showerror("Error", f"Error al obtener momentos: {e}")

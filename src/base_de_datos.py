@@ -123,9 +123,9 @@ def agregar_experiencia(usuario_id, vino_id, contexto, maridaje, companeros):
     parametros = (usuario_id, vino_id, contexto, maridaje, companeros)
     ejecutar_consulta(consulta, parametros)
 
-def obtener_vinos():
-    consulta = "SELECT * FROM vinos"
-    return obtener_resultados(consulta)
+def obtener_vinos(vinos_id):
+    consulta = "SELECT nombre FROM vinos WHERE id = ?"
+    return obtener_resultados(consulta,(vinos_id,))
 
 def obtener_puntuaciones():
     consulta = "SELECT * FROM puntuaciones"
