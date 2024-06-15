@@ -33,22 +33,23 @@ class VentanaInicioSesion(tk.Tk):
         super().__init__()
         self.title("Winny - Iniciar Sesión")
         self.geometry("300x200")
-        
-        self.label_usuario = tk.Label(self, text="Usuario")
-        self.label_usuario.pack()
+        self.configure(bg="#4B0E0E")  # Fondo color burdeos oscuro
+
+        self.label_usuario = tk.Label(self, text="Usuario", bg="#4B0E0E", fg="white")
+        self.label_usuario.pack(pady=5)
         self.entry_usuario = tk.Entry(self)
-        self.entry_usuario.pack()
+        self.entry_usuario.pack(pady=5)
 
-        self.label_contrasena = tk.Label(self, text="Contraseña")
-        self.label_contrasena.pack()
+        self.label_contrasena = tk.Label(self, text="Contraseña", bg="#4B0E0E", fg="white")
+        self.label_contrasena.pack(pady=5)
         self.entry_contrasena = tk.Entry(self, show="*")
-        self.entry_contrasena.pack()
+        self.entry_contrasena.pack(pady=5)
 
-        self.boton_iniciar_sesion = tk.Button(self, text="Iniciar Sesión", command=self.iniciar_sesion)
-        self.boton_iniciar_sesion.pack()
+        self.boton_iniciar_sesion = tk.Button(self, text="Iniciar Sesión", command=self.iniciar_sesion, bg="#8B0000", fg="white")
+        self.boton_iniciar_sesion.pack(pady=10)
 
-        self.boton_registrar = tk.Button(self, text="Registrar", command=self.registrar)
-        self.boton_registrar.pack()
+        self.boton_registrar = tk.Button(self, text="Registrar", command=self.registrar, bg="#A52A2A", fg="white")
+        self.boton_registrar.pack(pady=5)
 
     def iniciar_sesion(self):
         nombre_usuario = self.entry_usuario.get()
@@ -71,19 +72,20 @@ class VentanaRegistro(tk.Toplevel):
         super().__init__(parent)
         self.title("Winny - Registrar")
         self.geometry("300x200")
-        
-        self.label_usuario = tk.Label(self, text="Usuario")
-        self.label_usuario.pack()
+        self.configure(bg="#4B0E0E")  # Fondo color burdeos oscuro
+
+        self.label_usuario = tk.Label(self, text="Usuario", bg="#4B0E0E", fg="white")
+        self.label_usuario.pack(pady=5)
         self.entry_usuario = tk.Entry(self)
-        self.entry_usuario.pack()
+        self.entry_usuario.pack(pady=5)
 
-        self.label_contrasena = tk.Label(self, text="Contraseña")
-        self.label_contrasena.pack()
+        self.label_contrasena = tk.Label(self, text="Contraseña", bg="#4B0E0E", fg="white")
+        self.label_contrasena.pack(pady=5)
         self.entry_contrasena = tk.Entry(self, show="*")
-        self.entry_contrasena.pack()
+        self.entry_contrasena.pack(pady=5)
 
-        self.boton_registrar = tk.Button(self, text="Registrar", command=self.registrar)
-        self.boton_registrar.pack()
+        self.boton_registrar = tk.Button(self, text="Registrar", command=self.registrar, bg="#8B0000", fg="white")
+        self.boton_registrar.pack(pady=10)
 
     def registrar(self):
         nombre_usuario = self.entry_usuario.get()
@@ -100,18 +102,19 @@ class VentanaPrincipal(tk.Tk):
         super().__init__()
         self.title("Winny - Principal")
         self.geometry("400x300")
-        
-        self.boton_mis_momentos = tk.Button(self, text="Mis Momentos", command=self.ver_mis_momentos)
-        self.boton_mis_momentos.pack()
+        self.configure(bg="#4B0E0E")  # Fondo color burdeos oscuro
 
-        self.boton_crear_momento = tk.Button(self, text="Crear Momento", command=self.crear_momento)
-        self.boton_crear_momento.pack()
+        self.boton_mis_momentos = tk.Button(self, text="Mis Momentos", command=self.ver_mis_momentos, bg="#8B0000", fg="white")
+        self.boton_mis_momentos.pack(pady=10)
 
-        self.boton_top = tk.Button(self, text="Top Vinos", command=self.top_vinos)
-        self.boton_top.pack()
+        self.boton_crear_momento = tk.Button(self, text="Crear Momento", command=self.crear_momento, bg="#A52A2A", fg="white")
+        self.boton_crear_momento.pack(pady=10)
 
-        self.boton_cerrar_sesion = tk.Button(self, text="Cerrar sesión", command=self.cerrar_sesion)
-        self.boton_cerrar_sesion.pack()
+        self.boton_top = tk.Button(self, text="Top Vinos", command=self.top_vinos, bg="#B22222", fg="white")
+        self.boton_top.pack(pady=10)
+
+        self.boton_cerrar_sesion = tk.Button(self, text="Cerrar sesión", command=self.cerrar_sesion, bg="#800000", fg="white")
+        self.boton_cerrar_sesion.pack(pady=10)
 
     def ver_mis_momentos(self):
         self.withdraw()
@@ -140,16 +143,17 @@ class VentanaMisMomentos(tk.Toplevel):
         self.usuario_actual_id = usuario_actual_id
         self.title("Mis Momentos")
         self.geometry("400x400")
+        self.configure(bg="#4B0E0E")  # Fondo color burdeos oscuro
 
-        self.boton_regresar = tk.Button(self, text="Regresar", command=self.regresar)
-        self.boton_regresar.pack()
+        self.boton_regresar = tk.Button(self, text="Regresar", command=self.regresar, bg="#800000", fg="white")
+        self.boton_regresar.pack(pady=10)
 
         try:
             momentos = obtener_experiencias(self.usuario_actual_id)  # Obtener los momentos del usuario actual
             for momento in momentos:
                 vino_info = obtener_vinos(momento[2])  # Obtener información del vino por vino_id
                 momento_info = f"Vino: {vino_info}, Contexto: {momento[3]}, Maridaje: {momento[4]}, Compañeros: {momento[5]}"
-                tk.Label(self, text=momento_info).pack()
+                tk.Label(self, text=momento_info, bg="#4B0E0E", fg="white").pack(pady=5)
         except Exception as e:
             messagebox.showerror("Error", f"Error al obtener momentos: {e}")
 
@@ -163,42 +167,43 @@ class VentanaCrearMomento(tk.Toplevel):
         self.usuario_actual_id = usuario_actual_id
         self.title("Crear Momento - Paso 1")
         self.geometry("400x400")
+        self.configure(bg="#4B0E0E")  # Fondo color burdeos oscuro
 
-        self.label_vino = tk.Label(self, text="Vino")
-        self.label_vino.pack()
+        self.label_vino = tk.Label(self, text="Vino", bg="#4B0E0E", fg="white")
+        self.label_vino.pack(pady=5)
         self.entry_vino = tk.Entry(self)
-        self.entry_vino.pack()
+        self.entry_vino.pack(pady=5)
 
-        self.label_bodega = tk.Label(self, text="Bodega")
-        self.label_bodega.pack()
+        self.label_bodega = tk.Label(self, text="Bodega", bg="#4B0E0E", fg="white")
+        self.label_bodega.pack(pady=5)
         self.entry_bodega = tk.Entry(self)
-        self.entry_bodega.pack()
+        self.entry_bodega.pack(pady=5)
 
-        self.label_ano = tk.Label(self, text="Año")
-        self.label_ano.pack()
+        self.label_ano = tk.Label(self, text="Año", bg="#4B0E0E", fg="white")
+        self.label_ano.pack(pady=5)
         self.entry_ano = tk.Entry(self)
-        self.entry_ano.pack()
+        self.entry_ano.pack(pady=5)
 
-        self.label_tipo_uva = tk.Label(self, text="Tipo de Uva")
-        self.label_tipo_uva.pack()
+        self.label_tipo_uva = tk.Label(self, text="Tipo de Uva", bg="#4B0E0E", fg="white")
+        self.label_tipo_uva.pack(pady=5)
         self.entry_tipo_uva = tk.Entry(self)
-        self.entry_tipo_uva.pack()
+        self.entry_tipo_uva.pack(pady=5)
 
-        self.label_denominacion_origen = tk.Label(self, text="Denominación de Origen")
-        self.label_denominacion_origen.pack()
+        self.label_denominacion_origen = tk.Label(self, text="Denominación de Origen", bg="#4B0E0E", fg="white")
+        self.label_denominacion_origen.pack(pady=5)
         self.entry_denominacion_origen = tk.Entry(self)
-        self.entry_denominacion_origen.pack()
+        self.entry_denominacion_origen.pack(pady=5)
 
-        self.label_precio = tk.Label(self, text="Precio")
-        self.label_precio.pack()
+        self.label_precio = tk.Label(self, text="Precio", bg="#4B0E0E", fg="white")
+        self.label_precio.pack(pady=5)
         self.entry_precio = tk.Entry(self)
-        self.entry_precio.pack()
+        self.entry_precio.pack(pady=5)
 
-        self.boton_siguiente = tk.Button(self, text="Siguiente", command=self.guardar_vino)
-        self.boton_siguiente.pack()
+        self.boton_siguiente = tk.Button(self, text="Siguiente", command=self.guardar_vino, bg="#8B0000", fg="white")
+        self.boton_siguiente.pack(pady=10)
 
-        self.boton_regresar = tk.Button(self, text="Regresar", command=self.regresar)
-        self.boton_regresar.pack()
+        self.boton_regresar = tk.Button(self, text="Regresar", command=self.regresar, bg="#800000", fg="white")
+        self.boton_regresar.pack(pady=10)
 
     def guardar_vino(self):
         try:
@@ -229,34 +234,35 @@ class VentanaCrearMomento2(tk.Toplevel):
         super().__init__(parent)
         self.title("Crear Momento - Paso 2")
         self.geometry("400x400")
+        self.configure(bg="#4B0E0E")  # Fondo color burdeos oscuro
         self.usuario_actual_id = usuario_actual_id
         self.vino_id = vino_id
 
-        self.label_contexto = tk.Label(self, text="Contexto")
-        self.label_contexto.pack()
+        self.label_contexto = tk.Label(self, text="Contexto", bg="#4B0E0E", fg="white")
+        self.label_contexto.pack(pady=5)
         self.entry_contexto = tk.Entry(self)
-        self.entry_contexto.pack()
+        self.entry_contexto.pack(pady=5)
 
-        self.label_maridaje = tk.Label(self, text="Maridaje")
-        self.label_maridaje.pack()
+        self.label_maridaje = tk.Label(self, text="Maridaje", bg="#4B0E0E", fg="white")
+        self.label_maridaje.pack(pady=5)
         self.entry_maridaje = tk.Entry(self)
-        self.entry_maridaje.pack()
+        self.entry_maridaje.pack(pady=5)
 
-        self.label_companeros = tk.Label(self, text="Compañeros")
-        self.label_companeros.pack()
+        self.label_companeros = tk.Label(self, text="Compañeros", bg="#4B0E0E", fg="white")
+        self.label_companeros.pack(pady=5)
         self.entry_companeros = tk.Entry(self)
-        self.entry_companeros.pack()
+        self.entry_companeros.pack(pady=5)
 
-        self.label_puntuacion = tk.Label(self, text="Puntuación")
-        self.label_puntuacion.pack()
+        self.label_puntuacion = tk.Label(self, text="Puntuación", bg="#4B0E0E", fg="white")
+        self.label_puntuacion.pack(pady=5)
         self.entry_puntuacion = tk.Entry(self)
-        self.entry_puntuacion.pack()
+        self.entry_puntuacion.pack(pady=5)
 
-        self.boton_guardar = tk.Button(self, text="Guardar Momento", command=self.guardar_momento)
-        self.boton_guardar.pack()
+        self.boton_guardar = tk.Button(self, text="Guardar Momento", command=self.guardar_momento, bg="#8B0000", fg="white")
+        self.boton_guardar.pack(pady=10)
 
-        self.boton_regresar = tk.Button(self, text="Regresar", command=self.regresar)
-        self.boton_regresar.pack()
+        self.boton_regresar = tk.Button(self, text="Regresar", command=self.regresar, bg="#800000", fg="white")
+        self.boton_regresar.pack(pady=10)
 
     def guardar_momento(self):
         try:
@@ -290,15 +296,16 @@ class VentanaTopVinos(tk.Toplevel):
         self.usuario_actual_id = usuario_actual_id
         self.title("Top vinos")
         self.geometry("400x400")
+        self.configure(bg="#4B0E0E")  # Fondo color burdeos oscuro
 
-        self.boton_rcp = tk.Button(self, text="Mejor RCP", command=self.rcp)
-        self.boton_rcp.pack()
+        self.boton_rcp = tk.Button(self, text="Mejor RCP", command=self.rcp, bg="#8B0000", fg="white")
+        self.boton_rcp.pack(pady=10)
 
-        self.boton_mejor = tk.Button(self, text="Mejor vino", command=self.mejor)
-        self.boton_mejor.pack()
+        self.boton_mejor = tk.Button(self, text="Mejor Vino", command=self.mejor, bg="#A52A2A", fg="white")
+        self.boton_mejor.pack(pady=10)
 
-        self.boton_regresar = tk.Button(self, text="Regresar", command=self.regresar)
-        self.boton_regresar.pack()
+        self.boton_regresar = tk.Button(self, text="Regresar", command=self.regresar, bg="#800000", fg="white")
+        self.boton_regresar.pack(pady=10)
 
     def rcp(self):
         try:
@@ -306,7 +313,7 @@ class VentanaTopVinos(tk.Toplevel):
             if vinos_rcp:
                 for vino in vinos_rcp:
                     info_vino = f"Nombre: {vino[0]}, Precio: {vino[1]}, Puntuación: {vino[2]}"
-                    tk.Label(self, text=info_vino).pack()
+                    tk.Label(self, text=info_vino, bg="#4B0E0E", fg="white").pack(pady=5)
             else:
                 messagebox.showinfo("Info", "No se encontraron vinos con RCP")
         except Exception as e:
@@ -317,7 +324,7 @@ class VentanaTopVinos(tk.Toplevel):
             mejor_vino = obtener_vino_mejor_puntuacion(self.usuario_actual_id)
             if mejor_vino:
                 info_vino = f"Nombre: {mejor_vino[0]}, Puntuación: {mejor_vino[1]}"
-                tk.Label(self, text=info_vino).pack()
+                tk.Label(self, text=info_vino, bg="#4B0E0E", fg="white").pack(pady=5)
             else:
                 messagebox.showinfo("Info", "No se encontraron vinos con mejor puntuación")
         except Exception as e:
