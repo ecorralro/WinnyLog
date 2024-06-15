@@ -106,8 +106,8 @@ class VentanaPrincipal(tk.Tk):
         self.boton_crear_momento = tk.Button(self, text="Crear Momento", command=self.crear_momento)
         self.boton_crear_momento.pack()
 
-        self.boton_recordar_momento = tk.Button(self, text="Recordar Momento", command=self.recordar_momento)
-        self.boton_recordar_momento.pack()
+        self.boton_top = tk.Button(self, text="Top Vinos", command=self.top_vinos)
+        self.boton_top.pack()
 
     def ver_mis_momentos(self):
         self.withdraw()
@@ -121,9 +121,9 @@ class VentanaPrincipal(tk.Tk):
         ventana_crear_momento.mainloop()
         self.deiconify()
 
-    def recordar_momento(self):
+    def top_vinos(self):
         self.withdraw()
-        ventana_recordar_momento = VentanaRecordarMomento(self)
+        ventana_recordar_momento = VentanaTopVinos(self)
         ventana_recordar_momento.mainloop()
         self.deiconify()
 
@@ -277,14 +277,26 @@ class VentanaCrearMomento2(tk.Toplevel):
         self.destroy()
         self.master.deiconify()
 
-class VentanaRecordarMomento(tk.Toplevel):
+class VentanaTopVinos(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
-        self.title("Recordar Momento")
+        self.title("Top vinos")
         self.geometry("400x400")
+
+        self.boton_rcp = tk.Button(self, text="Mejor RCP", command=self.rcp)
+        self.boton_rcp.pack()
+
+        self.boton_mejor = tk.Button(self, text="Mejor vino", command=self.mejor)
+        self.boton_mejor.pack()
 
         self.boton_regresar = tk.Button(self, text="Regresar", command=self.regresar)
         self.boton_regresar.pack()
+
+    def rcp(self):
+        pass
+
+    def mejor(self):
+        pass
 
     def regresar(self):
         self.destroy()
