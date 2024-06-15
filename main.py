@@ -257,16 +257,13 @@ class VentanaCrearMomento2(tk.Toplevel):
             companeros = self.entry_companeros.get()
 
             # Agregar experiencia
-            experiencia_id = agregar_experiencia(self.usuario_actual_id, self.vino_id, contexto, maridaje, companeros)
-            if experiencia_id is None:
-                raise ValueError("No se pudo agregar la experiencia")
+            agregar_experiencia(self.usuario_actual_id, self.vino_id, contexto, maridaje, companeros)   
 
             # Obtener puntuación
             puntuacion = int(self.entry_puntuacion.get()) if self.entry_puntuacion.get() else 0
 
             # Agregar puntuación
-            if not agregar_puntuacion(experiencia_id, puntuacion):
-                raise ValueError("No se pudo agregar la puntuación")
+            agregar_puntuacion(self.usuario_actual_id,self.vino_id,  puntuacion)
 
             messagebox.showinfo("Éxito", "Momento guardado correctamente")
             self.destroy()
