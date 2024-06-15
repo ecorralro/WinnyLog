@@ -135,3 +135,18 @@ def obtener_experiencias(usuario_id):
     consulta = "SELECT * FROM experiencias WHERE usuario_id = ?"
     parametros = (usuario_id,)
     return obtener_resultados(consulta, parametros)
+def obtener_vino_mejor_rcp():
+    try:
+        consulta = """
+        SELECT vinos.nombre, vinos.precio, puntuaciones.puntuacion
+        FROM vinos
+        JOIN puntuaciones ON vinos.id = puntuaciones.vino_id
+        WHERE puntuaciones.puntuacion = (SELECT MAX(puntuacion) FROM puntuaciones)
+        ORDER BY vinos.precio ASC
+        LIMIT 1
+        """
+        resultados = obtener_resultados(consulta)
+        return resultados if resultados else None
+    except Exception as e:
+        print(f"Error al obtener el vino con mejor RCP: {e}")
+        return None
