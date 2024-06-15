@@ -1,22 +1,11 @@
 import tkinter as tk
 from tkinter import messagebox
-from src.base_de_datos import (ejecutar_consulta, obtener_resultados, crear_tabla_usuarios, 
-                           crear_tablas_adicionales, agregar_vino, agregar_opinion, 
-                           agregar_experiencia, obtener_vinos, obtener_opiniones, obtener_experiencias)
+from src.base_de_datos import ejecutar_consulta, obtener_resultados, crear_tabla_usuarios, crear_tablas_adicionales
+from src.base_de_datos import agregar_vino, agregar_experiencia, obtener_experiencias, agregar_puntuacion
 
-class SesionUsuario:
-    def __init__(self):
-        self.id = None
+# Variable global para almacenar el ID del usuario actual
+usuario_actual_id = None
 
-    def iniciar_sesion(self, id):
-        self.id = id
-
-    def cerrar_sesion(self):
-        self.id = None
-
-    def es_activo(self):
-        return self.id is not None
-    
 # Funciones de autenticación
 def registrar_usuario(nombre_usuario, contrasena):
     try:
@@ -27,20 +16,21 @@ def registrar_usuario(nombre_usuario, contrasena):
         return False
 
 def iniciar_sesion_usuario(nombre_usuario, contrasena):
+    global usuario_actual_id
     try:
         resultados = obtener_resultados("SELECT id FROM usuarios WHERE nombre_usuario = ? AND contrasena = ?", (nombre_usuario, contrasena))
-        if resultados:
-            return resultados[0][0]
-        return None
+        if len(resultados) > 0:
+            usuario_actual_id = resultados[0][0]
+            return True
+        return False
     except Exception as e:
         print(f"Error al iniciar sesión: {e}")
-        return None
+        return False
 
 # Interfaz gráfica
 class VentanaInicioSesion(tk.Tk):
-    def __init__(self, sesion_usuario):
+    def __init__(self):
         super().__init__()
-        self.sesion_usuario = sesion_usuario
         self.title("Winny - Iniciar Sesión")
         self.geometry("300x200")
         
@@ -63,31 +53,22 @@ class VentanaInicioSesion(tk.Tk):
     def iniciar_sesion(self):
         nombre_usuario = self.entry_usuario.get()
         contrasena = self.entry_contrasena.get()
-        usuario_id = iniciar_sesion_usuario(nombre_usuario, contrasena)
-        if usuario_id:
-            self.sesion_usuario.iniciar_sesion(usuario_id)
+        if iniciar_sesion_usuario(nombre_usuario, contrasena):
             messagebox.showinfo("Éxito", "Inicio de sesión correcto")
             self.destroy()
-            VentanaPrincipal(self.sesion_usuario).mainloop()
+            VentanaPrincipal().mainloop()
         else:
             messagebox.showerror("Error", "Usuario o contraseña incorrectos")
 
     def registrar(self):
-        self.toggle_window()
-        ventana_registro = VentanaRegistro(self, self.sesion_usuario)
+        self.withdraw()
+        ventana_registro = VentanaRegistro(self)
         ventana_registro.mainloop()
-        self.toggle_window()
-
-    def toggle_window(self):
-        if self.state() == 'normal':
-            self.withdraw()
-        else:
-            self.deiconify()
+        self.deiconify()
 
 class VentanaRegistro(tk.Toplevel):
-    def __init__(self, parent, sesion_usuario):
+    def __init__(self, parent):
         super().__init__(parent)
-        self.sesion_usuario = sesion_usuario
         self.title("Winny - Registrar")
         self.geometry("300x200")
         
@@ -114,9 +95,8 @@ class VentanaRegistro(tk.Toplevel):
             messagebox.showerror("Error", "No se pudo registrar el usuario")
 
 class VentanaPrincipal(tk.Tk):
-    def __init__(self, sesion_usuario):
+    def __init__(self):
         super().__init__()
-        self.sesion_usuario = sesion_usuario
         self.title("Winny - Principal")
         self.geometry("400x300")
         
@@ -130,33 +110,26 @@ class VentanaPrincipal(tk.Tk):
         self.boton_recordar_momento.pack()
 
     def ver_mis_momentos(self):
-        self.toggle_window()
-        ventana_mis_momentos = VentanaMisMomentos(self, self.sesion_usuario)
+        self.withdraw()
+        ventana_mis_momentos = VentanaMisMomentos(self)
         ventana_mis_momentos.mainloop()
-        self.toggle_window()
+        self.deiconify()
 
     def crear_momento(self):
-        self.toggle_window()
-        ventana_crear_momento = VentanaCrearMomento(self, self.sesion_usuario)
+        self.withdraw()
+        ventana_crear_momento = VentanaCrearMomento(self)
         ventana_crear_momento.mainloop()
-        self.toggle_window()
+        self.deiconify()
 
     def recordar_momento(self):
-        self.toggle_window()
-        ventana_recordar_momento = VentanaRecordarMomento(self, self.sesion_usuario)
+        self.withdraw()
+        ventana_recordar_momento = VentanaRecordarMomento(self)
         ventana_recordar_momento.mainloop()
-        self.toggle_window()
-
-    def toggle_window(self):
-        if self.state() == 'normal':
-            self.withdraw()
-        else:
-            self.deiconify()
+        self.deiconify()
 
 class VentanaMisMomentos(tk.Toplevel):
-    def __init__(self, parent, sesion_usuario):
+    def __init__(self, parent):
         super().__init__(parent)
-        self.sesion_usuario = sesion_usuario
         self.title("Mis Momentos")
         self.geometry("400x400")
 
@@ -164,9 +137,9 @@ class VentanaMisMomentos(tk.Toplevel):
         self.boton_regresar.pack()
 
         try:
-            momentos = obtener_experiencias(self.sesion_usuario.id)  # Obtener los momentos del usuario actual
+            momentos = obtener_experiencias(usuario_actual_id)  # Obtener los momentos del usuario actual
             for momento in momentos:
-                momento_info = f"Vino: {momento[1]}, Contexto: {momento[2]}, Maridaje: {momento[3]}, Amigos: {momento[4]}"
+                momento_info = f"Vino: {momento[1]}, Contexto: {momento[2]}, Maridaje: {momento[3]}, Compañeros: {momento[4]}"
                 tk.Label(self, text=momento_info).pack()
         except Exception as e:
             messagebox.showerror("Error", f"Error al obtener momentos: {e}")
@@ -176,16 +149,15 @@ class VentanaMisMomentos(tk.Toplevel):
         self.master.deiconify()
 
 class VentanaCrearMomento(tk.Toplevel):
-    def __init__(self, parent, sesion_usuario):
+    def __init__(self, parent):
         super().__init__(parent)
-        self.sesion_usuario = sesion_usuario
         self.title("Crear Momento")
-        self.geometry("300x500")
+        self.geometry("400x600")
 
-        self.label_nombre = tk.Label(self, text="Nombre del Vino")
-        self.label_nombre.pack()
-        self.entry_nombre = tk.Entry(self)
-        self.entry_nombre.pack()
+        self.label_vino = tk.Label(self, text="Vino")
+        self.label_vino.pack()
+        self.entry_vino = tk.Entry(self)
+        self.entry_vino.pack()
 
         self.label_bodega = tk.Label(self, text="Bodega")
         self.label_bodega.pack()
@@ -227,6 +199,11 @@ class VentanaCrearMomento(tk.Toplevel):
         self.entry_companeros = tk.Entry(self)
         self.entry_companeros.pack()
 
+        self.label_puntuacion = tk.Label(self, text="Puntuación")
+        self.label_puntuacion.pack()
+        self.entry_puntuacion = tk.Entry(self)
+        self.entry_puntuacion.pack()
+
         self.boton_guardar = tk.Button(self, text="Guardar", command=self.guardar_momento)
         self.boton_guardar.pack()
 
@@ -235,32 +212,45 @@ class VentanaCrearMomento(tk.Toplevel):
 
     def guardar_momento(self):
         try:
-            nombre = self.entry_nombre.get()
+            # Obtener datos de vino
+            nombre_vino = self.entry_vino.get()
             bodega = self.entry_bodega.get()
-            ano = self.entry_ano.get()
+            ano = int(self.entry_ano.get()) if self.entry_ano.get() else 0
             tipo_uva = self.entry_tipo_uva.get()
             denominacion_origen = self.entry_denominacion_origen.get()
-            precio = self.entry_precio.get()
+            precio = float(self.entry_precio.get()) if self.entry_precio.get() else 0.0
+
+            # Agregar vino y obtener su ID
+            vino_id = agregar_vino(nombre_vino, bodega, ano, tipo_uva, denominacion_origen, precio)
+            if vino_id is None:
+                raise ValueError("No se pudo agregar el vino")
+
+            # Obtener datos de experiencia
             contexto = self.entry_contexto.get()
             maridaje = self.entry_maridaje.get()
             companeros = self.entry_companeros.get()
 
-            agregar_vino(nombre, bodega, ano, tipo_uva, denominacion_origen, precio)
-            agregar_experiencia(self.sesion_usuario.id, contexto, maridaje, companeros)
-            messagebox.showinfo("Éxito", "Momento agregado correctamente")
-            self.destroy()
-            self.master.deiconify()
+            # Agregar experiencia asociada al usuario actual y al vino registrado
+            agregar_experiencia(usuario_actual_id, vino_id, contexto, maridaje, companeros)
+
+            # Obtener datos de puntuación
+            puntuacion = self.entry_puntuacion.get()
+
+            # Agregar puntuación asociada al usuario actual y al vino registrado
+            agregar_puntuacion(usuario_actual_id, vino_id, puntuacion)
+
+            messagebox.showinfo("Éxito", "Momento guardado correctamente")
+            self.regresar()
         except Exception as e:
-            messagebox.showerror("Error", f"No se pudo guardar el momento: {e}")
+            messagebox.showerror("Error", f"Error al guardar momento: {e}")
 
     def regresar(self):
         self.destroy()
         self.master.deiconify()
 
 class VentanaRecordarMomento(tk.Toplevel):
-    def __init__(self, parent, sesion_usuario):
+    def __init__(self, parent):
         super().__init__(parent)
-        self.sesion_usuario = sesion_usuario
         self.title("Recordar Momento")
         self.geometry("400x500")
 
@@ -274,7 +264,7 @@ class VentanaRecordarMomento(tk.Toplevel):
         self.entry_maridaje = tk.Entry(self)
         self.entry_maridaje.pack()
 
-        self.label_companeros = tk.Label(self, text="Amigos")
+        self.label_companeros = tk.Label(self, text="Compañeros")
         self.label_companeros.pack()
         self.entry_companeros = tk.Entry(self)
         self.entry_companeros.pack()
@@ -294,23 +284,28 @@ class VentanaRecordarMomento(tk.Toplevel):
             maridaje = self.entry_maridaje.get()
             companeros = self.entry_companeros.get()
             
-            query = "SELECT * FROM experiencias WHERE usuario_id = ?"
-            parametros = [self.sesion_usuario.id]
+            query = """
+            SELECT experiencias.id, vinos.nombre, experiencias.contexto, experiencias.maridaje, experiencias.companeros
+            FROM experiencias
+            JOIN vinos ON experiencias.vino_id = vinos.id
+            WHERE experiencias.usuario_id = ?
+            """
+            parametros = [usuario_actual_id]
 
             if contexto:
-                query += " AND contexto LIKE ?"
+                query += " AND experiencias.contexto LIKE ?"
                 parametros.append(f"%{contexto}%")
             if maridaje:
-                query += " AND maridaje LIKE ?"
+                query += " AND experiencias.maridaje LIKE ?"
                 parametros.append(f"%{maridaje}%")
             if companeros:
-                query += " AND companeros LIKE ?"
+                query += " AND experiencias.companeros LIKE ?"
                 parametros.append(f"%{companeros}%")
 
             momentos = obtener_resultados(query, parametros)
             self.resultados.delete(1.0, tk.END)
             for momento in momentos:
-                momento_info = f"Vino: {momento[1]}, Contexto: {momento[2]}, Maridaje: {momento[3]}, Amigos: {momento[4]}"
+                momento_info = f"Vino: {momento[1]}, Contexto: {momento[2]}, Maridaje: {momento[3]}, Compañeros: {momento[4]}"
                 self.resultados.insert(tk.END, momento_info + "\n")
         except Exception as e:
             messagebox.showerror("Error", f"Error al buscar momentos: {e}")
@@ -324,9 +319,6 @@ if __name__ == "__main__":
     crear_tabla_usuarios()
     crear_tablas_adicionales()
 
-    # Iniciar la sesión de usuario
-    sesion_usuario = SesionUsuario()
-
     # Iniciar la aplicación
-    app = VentanaInicioSesion(sesion_usuario)
+    app = VentanaInicioSesion()
     app.mainloop()

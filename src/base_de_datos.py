@@ -48,21 +48,25 @@ def crear_tablas_adicionales():
         )
         """,
         """
-        CREATE TABLE IF NOT EXISTS opiniones (
+        CREATE TABLE IF NOT EXISTS puntuaciones (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            id_vino INTEGER,
-            opinion TEXT,
-            FOREIGN KEY (id_vino) REFERENCES vinos(id)
+            usuario_id INTEGER,
+            vino_id INTEGER,
+            puntuacion TEXT,
+            FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+            FOREIGN KEY (vino_id) REFERENCES vinos(id)
         )
         """,
         """
         CREATE TABLE IF NOT EXISTS experiencias (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             usuario_id INTEGER,
+            vino_id INTEGER,
             contexto TEXT,
             maridaje TEXT,
             companeros TEXT,
-            FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+            FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+            FOREIGN KEY (vino_id) REFERENCES vinos(id)
         )
         """
     ]
@@ -70,35 +74,45 @@ def crear_tablas_adicionales():
         ejecutar_consulta(consulta)
 
 def agregar_vino(nombre, bodega, ano, tipo_uva, denominacion_origen, precio):
+    try:
+        consulta = """
+        INSERT INTO vinos (nombre, bodega, ano, tipo_uva, denominacion_origen, precio)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """
+        parametros = (nombre, bodega, ano, tipo_uva, denominacion_origen, precio)
+        ejecutar_consulta(consulta, parametros)
+        vino_id = obtener_resultados("SELECT last_insert_rowid()")[0][0]
+        print(f"ID del vino insertado: {vino_id}")  # Línea de depuración
+        if vino_id == 0:
+            raise ValueError("Error al obtener ID del vino")
+        return vino_id
+    except Exception as e:
+        print(f"Error al agregar vino: {e}")
+        return None
+
+def agregar_puntuacion(usuario_id, vino_id, puntuacion):
     consulta = """
-    INSERT INTO vinos (nombre, bodega, ano, tipo_uva, denominacion_origen, precio)
-    VALUES (?, ?, ?, ?, ?, ?)
+    INSERT INTO puntuaciones (usuario_id, vino_id, puntuacion)
+    VALUES (?, ?, ?)
     """
-    parametros = (nombre, bodega, ano, tipo_uva, denominacion_origen, precio)
+    parametros = (usuario_id, vino_id, puntuacion)
     ejecutar_consulta(consulta, parametros)
 
-def agregar_opinion(id_vino, opinion):
-    consulta = """
-    INSERT INTO opiniones (id_vino, opinion)
-    VALUES (?, ?)
-    """
-    parametros = (id_vino, opinion)
-    ejecutar_consulta(consulta, parametros)
 
-def agregar_experiencia(usuario_id, contexto, maridaje, companeros):
+def agregar_experiencia(usuario_id, vino_id, contexto, maridaje, companeros):
     consulta = """
-    INSERT INTO experiencias (usuario_id, contexto, maridaje, companeros)
-    VALUES (?, ?, ?, ?)
+    INSERT INTO experiencias (usuario_id, vino_id, contexto, maridaje, companeros)
+    VALUES (?, ?, ?, ?, ?)
     """
-    parametros = (usuario_id, contexto, maridaje, companeros)
+    parametros = (usuario_id, vino_id, contexto, maridaje, companeros)
     ejecutar_consulta(consulta, parametros)
 
 def obtener_vinos():
     consulta = "SELECT * FROM vinos"
     return obtener_resultados(consulta)
 
-def obtener_opiniones():
-    consulta = "SELECT * FROM opiniones"
+def obtener_puntuaciones():
+    consulta = "SELECT * FROM puntuaciones"
     return obtener_resultados(consulta)
 
 def obtener_experiencias(usuario_id):
