@@ -8,8 +8,8 @@ def ejecutar_consulta(consulta, parametros=()):
         conexion.commit()
     except sqlite3.Error as e:
         print(f"Error en la ejecución de la consulta: {e}")
-    finally:
-        conexion.close()
+    # finally:
+        # conexion.close()
 
 def obtener_resultados(consulta, parametros=()):
     try:
@@ -75,18 +75,34 @@ def crear_tablas_adicionales():
 
 def agregar_vino(nombre, bodega, ano, tipo_uva, denominacion_origen, precio):
     try:
+        # Conectar a la base de datos
+        conexion = sqlite3.connect("winny.db")
+        cursor = conexion.cursor()
+        
+        # Consulta para insertar el vino
         consulta = """
         INSERT INTO vinos (nombre, bodega, ano, tipo_uva, denominacion_origen, precio)
         VALUES (?, ?, ?, ?, ?, ?)
         """
         parametros = (nombre, bodega, ano, tipo_uva, denominacion_origen, precio)
-        ejecutar_consulta(consulta, parametros)
-        vino_id = obtener_resultados("SELECT last_insert_rowid()")[0][0]
+        
+        # Ejecutar la consulta para insertar el vino
+        cursor.execute(consulta, parametros)
+        
+        # Obtener el ID del vino insertado usando last_insert_rowid()
+        vino_id = cursor.lastrowid
+        
         print(f"ID del vino insertado: {vino_id}")  # Línea de depuración
-        if vino_id == 0:
+        
+        # Confirmar la inserción y cerrar la conexión
+        conexion.commit()
+        conexion.close()
+        
+        if vino_id is None or vino_id == 0:
             raise ValueError("Error al obtener ID del vino")
+        
         return vino_id
-    except Exception as e:
+    except sqlite3.Error as e:
         print(f"Error al agregar vino: {e}")
         return None
 
