@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from src.base_de_datos import ejecutar_consulta, obtener_resultados, crear_tabla_usuarios, crear_tablas_adicionales
-from src.base_de_datos import agregar_vino, agregar_experiencia, agregar_puntuacion, obtener_experiencias, obtener_vinos, obtener_puntuaciones, obtener_vino_mejor_rcp
+from src.base_de_datos import agregar_vino, agregar_experiencia, agregar_puntuacion, obtener_experiencias, obtener_vinos, obtener_puntuaciones, obtener_vino_mejor_rcp, obtener_vino_mejor_puntuacion
 
 # Variable global para almacenar el ID del usuario actual
 usuario_actual_id = None
@@ -127,7 +127,7 @@ class VentanaPrincipal(tk.Tk):
 
     def top_vinos(self):
         self.withdraw()
-        ventana_top_vinos = VentanaTopVinos(self)
+        ventana_top_vinos = VentanaTopVinos(self, usuario_actual_id)
         ventana_top_vinos.mainloop()
         self.deiconify()
 
@@ -285,8 +285,9 @@ class VentanaCrearMomento2(tk.Toplevel):
         self.master.deiconify()
 
 class VentanaTopVinos(tk.Toplevel):
-    def __init__(self, parent):
+    def __init__(self, parent, usuario_actual_id):
         super().__init__(parent)
+        self.usuario_actual_id = usuario_actual_id
         self.title("Top vinos")
         self.geometry("400x400")
 
@@ -301,7 +302,7 @@ class VentanaTopVinos(tk.Toplevel):
 
     def rcp(self):
         try:
-            vinos_rcp = obtener_vino_mejor_rcp()
+            vinos_rcp = obtener_vino_mejor_rcp(self.usuario_actual_id)
             if vinos_rcp:
                 for vino in vinos_rcp:
                     info_vino = f"Nombre: {vino[0]}, Precio: {vino[1]}, Puntuación: {vino[2]}"
@@ -313,30 +314,14 @@ class VentanaTopVinos(tk.Toplevel):
 
     def mejor(self):
         try:
-            puntuaciones = obtener_puntuaciones()
-            if puntuaciones:
-                mejor_puntuacion_vino_id = None
-                mejor_puntuacion = -1
-
-                for puntuacion in puntuaciones:
-                    puntuacion_valor = int(puntuacion[3])
-                    if puntuacion_valor > mejor_puntuacion:
-                        mejor_puntuacion = puntuacion_valor
-                        mejor_puntuacion_vino_id = puntuacion[2]
-
-                if mejor_puntuacion_vino_id:
-                    mejor_vino_info = obtener_vinos(mejor_puntuacion_vino_id)
-                    if mejor_vino_info:
-                        vino_info = mejor_vino_info[0]
-                        messagebox.showinfo("Mejor Vino", f"Vino: {vino_info[0]}\nBodega: {vino_info[1]}\nAño: {vino_info[2]}\nTipo de Uva: {vino_info[3]}\nDenominación de Origen: {vino_info[4]}\nPrecio: {vino_info[5]}")
-                    else:
-                        messagebox.showerror("Error", "No se encontró información del vino")
-                else:
-                    messagebox.showerror("Error", "No se encontraron puntuaciones de vinos")
+            mejor_vino = obtener_vino_mejor_puntuacion(self.usuario_actual_id)
+            if mejor_vino:
+                info_vino = f"Nombre: {mejor_vino[0]}, Puntuación: {mejor_vino[1]}"
+                tk.Label(self, text=info_vino).pack()
             else:
-                messagebox.showerror("Error", "No se encontraron puntuaciones de vinos")
+                messagebox.showinfo("Info", "No se encontraron vinos con mejor puntuación")
         except Exception as e:
-            messagebox.showerror("Error", f"Error al obtener el mejor vino: {e}")
+            messagebox.showerror("Error", f"Error al obtener el vino con mejor puntuación: {e}")
 
     def regresar(self):
         self.destroy()
