@@ -93,7 +93,7 @@ class VentanaRegistro(tk.Toplevel):
         if registrar_usuario(nombre_usuario, contrasena):
             messagebox.showinfo("Éxito", "Registro correcto")
             self.destroy()
-            VentanaPrincipal().mainloop()
+            VentanaInicioSesion().mainloop()
         else:
             messagebox.showerror("Error", "No se pudo registrar el usuario")
 
@@ -135,7 +135,10 @@ class VentanaPrincipal(tk.Tk):
         self.deiconify()
 
     def cerrar_sesion(self):
-        self.destroy()
+        self.withdraw()
+        ventana_inicio = VentanaInicioSesion()
+        ventana_inicio.mainloop()
+        self.deiconify()
 
 class VentanaMisMomentos(tk.Toplevel):
     def __init__(self, parent, usuario_actual_id):
