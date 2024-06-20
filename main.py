@@ -337,7 +337,7 @@ class VentanaTopVinos(tk.Toplevel):
         self.destroy()
         self.master.deiconify()
 
-if __name__ == "__main__":
+if __name__ == "__main__": # en Python se utiliza para asegurar que cierto bloque de código solo se ejecute cuando el archivo es ejecutado directamente, y no cuando es importado como módulo en otro archivo.
     # Crear las tablas de la base de datos
     crear_tabla_usuarios()
     crear_tablas_adicionales()
